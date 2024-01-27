@@ -7,3 +7,16 @@ const setCookie = (name:string, value:any, daysToLive:number) => {
  const deleteCookie = (name:string) => {
    document.cookie = `${name}=; Max-Age=0; path=/`;
  };
+
+
+const getCookie = (name:string) => {
+  const cDecode = decodeURIComponent(document.cookie);
+  const cArray = cDecode.split("; ");
+  let ret ;
+  cArray.forEach((el, idx) => {
+    if(el.indexOf(name) == 0){
+      ret = el.substring(name.length + 1);
+    }
+  })
+  return ret;
+}
