@@ -1,0 +1,17 @@
+body{
+  background-color: gray;
+  color: white;
+}
+
+
+.images{
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.box{
+  max-width: 80%;
+}
+.box img{
+    max-width: 100%;
+}
