@@ -1,14 +1,16 @@
 
 "use client";
 import { useState } from 'react';
+import Image from 'next/image';
 import axios from 'axios';
+
+let arr = [''];
 
 const UploadImage = () => {
   const [image, setImage] = useState(null);
-
+  const [c, setc] = useState(0)
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    console.log(file.name);
     setImage(file);
   };
 
@@ -23,7 +25,10 @@ const UploadImage = () => {
         },
       });
 
-      console.log('Image uploaded successfully:', response.data);
+      console.log(response.data);
+      arr = response.data.message;
+      setc(c + 1);
+      console.log(arr);
     } catch (error) {
       console.log(error);
     }
@@ -31,8 +36,28 @@ const UploadImage = () => {
 
   return (
     <div>
-      <input type="file" accept="image/*,video/*" onChange={handleImageChange} />
-      <button onClick={handleUpload}>Upload Image</button>
+    
+      <div>
+        <input type="file" accept="image/*,video/*" onChange={handleImageChange} />
+        <button onClick={handleUpload}>Upload Image</button>
+      </div>
+
+      <div className='images'>
+      {
+        (c)?(
+          arr.map((el, idx) => {
+            return(
+              <div className='box' key={el}>
+                <img src={el} alt="" />
+              </div>
+            )
+          })
+        ):(
+          ""
+        )
+      }
+      </div>
+      
     </div>
   );
 };

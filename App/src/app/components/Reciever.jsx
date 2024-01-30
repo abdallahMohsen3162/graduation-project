@@ -1,57 +1,53 @@
 "use client"
 import React, { useState } from 'react';
 import axios from 'axios';
-const videoExtensions = ['.mp4', '.webm', '.avi'];
-const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
-let arr = [''];
-function detectType(name){
-  console.log(name);
-  let lstDot = name.lastIndexOf('.');
-  if(lstDot < 0){
-    return "Can't determine"
-  }
-  console.log(lstDot);
-  let ex = name.substring(lstDot)
-  console.log(ex);
-  if(videoExtensions.indexOf(ex) >= 0){
-    return "video";
-  }
-  if(imageExtensions.indexOf(ex) >= 0){
-    return "image";
-  }
-  return ex;
-}
+import { detectType } from '../../../helpers/fileHelper';
+import Loading from './Loading';
+let images = [''];
+let classes = [''];
+
 
 function UploadPage() {
   const [image, setImage] = useState(null);
+  const [c, setc] = useState(0)
   const [fileType, setFileType] = useState(null);
   const [filename, setfilename] = useState("");
+  const [loading, setloading] = useState(false);
 
-  function handleFileUpload(event) {
+  const handleFileUpload = (event) => {
     const file = event.target.files[0];
     setfilename(file.name);
     setImage(file);
     if (file) {
       console.log(detectType(file.name))
+      setFileType(detectType(file.name).toLocaleUpperCase())
+
     }
   }
 
-  function handleDragOver(event) {
-    event.preventDefault();
-  }
-
-  function handleDrop(event) {
+  const handleDrop = (event) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
     setImage(file);
     setfilename(file.name);
+
     if (file) {
       console.log(detectType(file.name))
+      setFileType(detectType(file.name).toLocaleUpperCase())
+
     }
+  }
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
   }
 
 
   const handleUpload = async () => {
+    if(!image){
+      return;
+    }
+    setloading(true);
     try {
       const formData = new FormData();
       formData.append('image', image);
@@ -62,10 +58,11 @@ function UploadPage() {
         },
       });
 
-      console.log(response.data);
-      arr = response.data.message;
+      setloading(false);
+      images = response.data.message;
+      classes = response.data.classes;
+      console.log(classes);
       setc(c + 1);
-      console.log(arr);
     } catch (error) {
       console.log(error);
     }
@@ -81,9 +78,40 @@ function UploadPage() {
         <p>Drag and drop a file here or click to browse</p>
         <input type="file" onChange={handleFileUpload} style={{ display: 'none' }} />
         <button onClick={() => document.querySelector('input[type="file"]').click()}>Browse</button>
-        {fileType && <p>File type: {filename}</p>}
+        {
+          (fileType)?(
+            <p>{fileType} File Detected</p>
+          ):(
+            ""
+          )
+        }
       </div>
       <button onClick={handleUpload}>Upload Image</button>
+
+      <div className='images'>
+      {
+        (c)?(
+          images.map((el, idx) => {
+            return(
+              <div className='box' key={el}>
+                <h2>{classes[idx]}</h2>
+                <img src={el} alt="" />
+              </div>
+            )
+          })
+        ):(
+          ""
+        )
+      }
+      </div>
+
+      {
+        (loading)?(
+          < Loading />
+        ):(
+          ""
+        )
+      }
     </div>
   );
 }
